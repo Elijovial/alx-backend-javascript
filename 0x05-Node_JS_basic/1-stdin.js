@@ -6,6 +6,7 @@ process.stdin.on('readable', function() {
     var chunk = process.stdin.read();
     if (chunk !== null) {
         process.stdout.write('Your name is: ' + chunk);
+	process.stdin.end(); // End the input stream after reading the name
     }
 });
 
