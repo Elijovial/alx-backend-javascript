@@ -1,30 +1,21 @@
-const { spawn } = require('child_process');
-const assert = require('assert');
+const { expect } = require('chai');
+const sinon = require('sinon');
 
-describe('1-stdin.js', function() {
-	this.timeout(5000); // Increase timeout to 5000ms
+const path = require('path');
+const child = require('child_process');
 
-	  it('should display welcome message and user input', (done) => {
-		      const process = spawn('node', ['1-stdin.js']);
+const exec = path.join(__dirname, '.', '1-stdin.js');
+const proc = child.spawn("node", [exec], { stdio: 'pipe' });
 
-		      let output = '';
-
-		      process.stdout.on('data', (data) => {
-			            output += data.toString();
-			            if (output.includes('Welcome to Holberton School, what is your name?')) {
-					            process.stdin.write('Bob\n');
-					          } else if (output.includes('Your name is: Bob')) {
-							          process.stdin.end();
-							        }
-			          });
-
-		      process.on('close', (code) => {
-			            assert(output.includes('Welcome to Holberton School, what is your name?'));
-			            assert(output.includes('Your name is: Bob'));
-			            assert(output.includes('This important software is now closing'));
-			            assert.strictEqual(code, 0);
-			            done();
+describe('main', () => {
+	  it('the user is entering a name', function (done) {
+		      proc.stdout.once('data', (test) => {
+			            expect(test.toString()).to.equal('Welcome to Holberton School, what is your name?\n');
+			            proc.stdin.write('Guillaumeh\r');
+			            proc.stdout.once('data', (test) => {
+					            expect(test.toString()).to.equal('Your name is: Guillaumeh\r');
+					            done();
+					          });
 			          });
 		    });
 });
-
